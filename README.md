@@ -8,7 +8,7 @@ Tweepy
 
 ```
 pip tweepy
-py ie-twtr-gh.py > results.txt
+py ie-twtr-gh.py
 ```
 Follow on screen instructions
 
@@ -27,3 +27,5 @@ Changed values example:
 ## TODO
 Have it all nicely sorted :/
 
+## ERRATUM
+Just notice that outputting to txt did not work :/

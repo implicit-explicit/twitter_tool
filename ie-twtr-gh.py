@@ -24,8 +24,12 @@ def limit_handled(cursor):
         try:
             yield cursor.next()
         except tweepy.RateLimitError:
-            time.sleep(15 * 60)
+            print("Rate Limit reached! Exiting program.")
+            sys.exit(1)
 
 for follower in limit_handled(tweepy.Cursor(api.followers, target).items()):
-    if follower.followers_count > 1000:
-        print(follower.name + " | " + follower.screen_name + " | " , follower.followers_count)
+    if follower.followers_count < 100:
+        print(follower.name, "|", follower.screen_name, "|" , follower.followers_count)
+        with open("results.txt", "w") as f:
+            for name in follower.name:
+                f.write(follower.name)

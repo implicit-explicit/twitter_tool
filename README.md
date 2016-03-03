@@ -1,16 +1,15 @@
 # Implicit-Explicit Twitter Growth Hacking Tool
 
 ## Requirements
-Python 3.5.1
+Python 3.5.1   
 Tweepy
 
 ## Usage
 
 ```
 pip tweepy
-py ie-twtr-gh.py
+py ie-twtr-gh.py > results.txt
 ```
-Follow on screen instructions
 
 ## Limitations
 Currently has hard coded Twitter app values from my Twitter account (@apleasantview) set up.

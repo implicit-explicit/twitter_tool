@@ -34,5 +34,14 @@ while cursor != 0:
 
         cursor = target["next_cursor"]
     except TwitterHTTPError as e:
-        print("Rate limit exceeded!", file = sys.stderr)
-        time.sleep(60)
+        if e.e.code == 429:
+            print("Fail: {} API rate limit exceeded".format(e.e.code), file = sys.stderr)
+            rate_limit_status = t.application.rate_limit_status()
+            time_to_reset_unix = rls.rate_limit_reset
+            time_to_reset_asc = _time.asctime(_time.localtime(time_to_reset_unix))
+            time_to_wait = int(rls.rate_limit_reset - _time.time()) + 5 # avoid race
+            print("Interval limit of {} requests reached, next reset on {}: going to sleep for %i secs".format(rls.rate_limit_limit, time_to_reset_asc, time_to_wait))
+            fail.wait(time_to_wait)
+            continue
+        # print("Rate limit exceeded!", file = sys.stderr)
+        # time.sleep(60)

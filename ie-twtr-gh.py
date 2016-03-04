@@ -1,7 +1,7 @@
 import sys
 import time
+import urllib
 from twitter import *
-
 
 # Keys, tokens and secrets
 consumer_key = ""
@@ -37,11 +37,13 @@ while cursor != 0:
         if e.e.code == 429:
             print("Fail: {} API rate limit exceeded".format(e.e.code), file = sys.stderr)
             rate_limit_status = t.application.rate_limit_status()
-            time_to_reset_unix = rls.rate_limit_reset
-            time_to_reset_asc = _time.asctime(_time.localtime(time_to_reset_unix))
-            time_to_wait = int(rls.rate_limit_reset - _time.time()) + 5 # avoid race
-            print("Interval limit of {} requests reached, next reset on {}: going to sleep for %i secs".format(rls.rate_limit_limit, time_to_reset_asc, time_to_wait))
-            fail.wait(time_to_wait)
+            time_to_reset_unix = rate_limit_status.rate_limit_reset
+            time_to_reset_asc = time.asctime(time.localtime(time_to_reset_unix))
+            time_to_wait = int(rate_limit_status.rate_limit_reset - time.time()) + 5 # avoid race
+            print("Interval limit of {} requests reached, next reset on {}: going to sleep for {} secs".format(rate_limit_status.rate_limit_limit, time_to_reset_asc, time_to_wait), file = sys.stderr)
+            time.sleep(time_to_wait)
             continue
+    except urllib.error.URLError as e:
+        continue
         # print("Rate limit exceeded!", file = sys.stderr)
         # time.sleep(60)

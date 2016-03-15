@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 import urllib.request
@@ -35,11 +36,20 @@ def get_auth_keys():
     return authorisation_keys
 
 
+def get_a_bearer_token(consumer_key, consumer_secret):
+    """ The bearer token enables us to do Application only request and up our rate limit some """
+    bearer_token_file = "bearer_token"
+    if not os.path.isfile(bearer_token_file):
+        oauth2_dance(consumer_key, consumer_secret, bearer_token_file)
+    return
+
 def main():
     target_name = target_check()
     auth_keys = get_auth_keys()
+    get_a_bearer_token(consumer_key=auth_keys[0], consumer_secret=auth_keys[1])
+    bearer_token = read_bearer_token_file("bearer_token")
     # OAuthHandler
-    twitter = Twitter(auth=OAuth(auth_keys[2], auth_keys[3], auth_keys[0], auth_keys[1]))
+    twitter = Twitter(auth=OAuth2(bearer_token=bearer_token))
     count = 200
     cursor = -1
 

@@ -9,3 +9,4 @@ Scripts/
 pip-selfcheck.json
 pyvenv.cfg
 auth_keys
+bearer_token

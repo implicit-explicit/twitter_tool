@@ -15,16 +15,31 @@ def target_check():
         sys.exit(2)
 
 
+def read_auth_file(filename):
+    """ Reads our auth_keys file """
+    try:
+        with open(filename, 'r') as file:
+            read_authentication_keys = []
+            for line in file:
+                read_authentication_keys.append(line.strip())
+        return read_authentication_keys
+    except FileNotFoundError:
+        print("The 'auth_keys' file has not been found! Make sure you have one!")
+        sys.exit(1)
+
+
+def get_auth_keys():
+    """ Gets the authorisation keys and tries for a bearer token w/ oauth2_dance()  """
+    filename = "auth_keys"
+    authorisation_keys = read_auth_file(filename)
+    return authorisation_keys
+
+
 def main():
     target_name = target_check()
-    # Keys, tokens and secrets
-    consumer_key = ""
-    consumer_secret = ""
-    access_token = ""
-    access_token_secret = ""
-
+    auth_keys = get_auth_keys()
     # OAuthHandler
-    twitter = Twitter(auth=OAuth(access_token, access_token_secret, consumer_key, consumer_secret))
+    twitter = Twitter(auth=OAuth(auth_keys[2], auth_keys[3], auth_keys[0], auth_keys[1]))
     count = 200
     cursor = -1
 

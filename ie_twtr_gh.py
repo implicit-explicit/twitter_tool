@@ -43,6 +43,7 @@ def get_a_bearer_token(consumer_key, consumer_secret):
         oauth2_dance(consumer_key, consumer_secret, bearer_token_file)
     return
 
+
 def target_info(target_name):
     """ Prints out basic info about our target """
     twitter = main_twitter_api_call()
@@ -52,6 +53,35 @@ def target_info(target_name):
     print(real_name, file=sys.stderr)
     print(followers_count, file=sys.stderr)
     return
+
+
+def get_target_followers(target_name):
+    """ Gets followers and their followers count from our target """
+    twitter = main_twitter_api_call()
+    count = 200
+    cursor = -1
+    while cursor != 0:
+        try:
+            target = twitter.followers.list(screen_name=target_name, count=count, cursor=cursor)
+            followers = target["users"]
+            for follower in followers:
+                print("{}, {}".format(follower["screen_name"], follower["followers_count"]))
+            cursor = target["next_cursor"]
+        except TwitterHTTPError as e:
+            if e.e.code == 429:
+                print("Fail: {} API rate limit exceeded".format(e.e.code), file=sys.stderr)
+                rate_limit_status = twitter.application.rate_limit_status()
+                time_to_reset_unix = rate_limit_status.rate_limit_reset
+                time_to_reset_asc = time.asctime(time.localtime(time_to_reset_unix))
+                time_to_wait = int(rate_limit_status.rate_limit_reset - time.time()) + 5  # avoid race
+                print("Interval limit of {} requests reached, next reset on {}: going to sleep for {} secs".format(
+                    rate_limit_status.rate_limit_limit, time_to_reset_asc, time_to_wait), file=sys.stderr)
+                time.sleep(time_to_wait)
+                continue
+        except urllib.request.URLError as e:
+            pass
+    return
+
 
 def main_twitter_api_call():
     """ This the main Twitter API call via the Python Twitter Tools """
@@ -71,37 +101,7 @@ def main():
     target_info(target_name)
 
     # The nitty gritty
-    twitter = main_twitter_api_call()
-
-    count = 200
-    cursor = -1
-
-    while cursor != 0:
-        try:
-            target = twitter.followers.list(screen_name=target_name, count=count, cursor=cursor)
-            followers = target["users"]
-            # print(cursor, file = sys.stderr)
-            # print(len(followers), file = sys.stderr)
-
-            for follower in followers:
-                print("{}, {}".format(follower["screen_name"], follower["followers_count"]))
-            cursor = target["next_cursor"]
-
-        except TwitterHTTPError as e:
-            if e.e.code == 429:
-                print("Fail: {} API rate limit exceeded".format(e.e.code), file=sys.stderr)
-                rate_limit_status = twitter.application.rate_limit_status()
-                time_to_reset_unix = rate_limit_status.rate_limit_reset
-                time_to_reset_asc = time.asctime(time.localtime(time_to_reset_unix))
-                time_to_wait = int(rate_limit_status.rate_limit_reset - time.time()) + 5  # avoid race
-                print("Interval limit of {} requests reached, next reset on {}: going to sleep for {} secs".format(
-                    rate_limit_status.rate_limit_limit, time_to_reset_asc, time_to_wait), file=sys.stderr)
-                time.sleep(time_to_wait)
-                continue
-        except urllib.request.URLError as e:
-            pass
-            # print("Rate limit exceeded!", file = sys.stderr)
-            # time.sleep(60)
+    get_target_followers(target_name)
 
 
 if __name__ == '__main__':

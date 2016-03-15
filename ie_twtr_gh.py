@@ -5,7 +5,18 @@ import urllib.request
 from twitter import *
 
 
+def target_check():
+    """ First check if a target has been given """
+    try:
+        if len(sys.argv[1]) > 0:
+            return sys.argv[1]
+    except IndexError:
+        print("No target given! Please call with a target!")
+        sys.exit(2)
+
+
 def main():
+    target_name = target_check()
     # Keys, tokens and secrets
     consumer_key = ""
     consumer_secret = ""
@@ -14,8 +25,6 @@ def main():
 
     # OAuthHandler
     twitter = Twitter(auth=OAuth(access_token, access_token_secret, consumer_key, consumer_secret))
-
-    target_name = sys.argv[1]
     count = 200
     cursor = -1
 
@@ -24,7 +33,7 @@ def main():
     followers_count = target_info["followers_count"]
     print(real_name, file=sys.stderr)
     print(followers_count, file=sys.stderr)
-    
+
     while cursor != 0:
         try:
             target = twitter.followers.list(screen_name=target_name, count=count, cursor=cursor)

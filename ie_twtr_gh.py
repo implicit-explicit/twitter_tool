@@ -43,6 +43,15 @@ def get_a_bearer_token(consumer_key, consumer_secret):
         oauth2_dance(consumer_key, consumer_secret, bearer_token_file)
     return
 
+def target_info(target_name):
+    """ Prints out basic info about our target """
+    twitter = main_twitter_api_call()
+    target_info = twitter.users.show(screen_name=target_name)
+    real_name = target_info["name"]
+    followers_count = target_info["followers_count"]
+    print(real_name, file=sys.stderr)
+    print(followers_count, file=sys.stderr)
+    return
 
 def main_twitter_api_call():
     """ This the main Twitter API call via the Python Twitter Tools """
@@ -58,17 +67,12 @@ def main():
     auth_keys = get_auth_keys()
     get_a_bearer_token(consumer_key=auth_keys[0], consumer_secret=auth_keys[1])
 
-    # OAuthHandler
-
-    # Some basic info about our target
-    twitter = main_twitter_api_call()
-    target_info = twitter.users.show(screen_name=target_name)
-    real_name = target_info["name"]
-    followers_count = target_info["followers_count"]
-    print(real_name, file=sys.stderr)
-    print(followers_count, file=sys.stderr)
+    # Output some basic info about our target
+    target_info(target_name)
 
     # The nitty gritty
+    twitter = main_twitter_api_call()
+
     count = 200
     cursor = -1
 

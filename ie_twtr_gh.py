@@ -4,28 +4,27 @@ import urllib.request
 
 from twitter import *
 
-# Keys, tokens and secrets
-consumer_key = ""
-consumer_secret = ""
-access_token = ""
-access_token_secret = ""
-
-# OAuthHandler
-twitter = Twitter(auth=OAuth(access_token, access_token_secret, consumer_key, consumer_secret))
-
-target_name = sys.argv[1]
-count = 200
-cursor = -1
-
-target_info = twitter.users.show(screen_name=target_name)
-real_name = target_info["name"]
-followers_count = target_info["followers_count"]
-print(real_name, file=sys.stderr)
-print(followers_count, file=sys.stderr)
-
 
 def main():
-    global cursor
+    # Keys, tokens and secrets
+    consumer_key = ""
+    consumer_secret = ""
+    access_token = ""
+    access_token_secret = ""
+
+    # OAuthHandler
+    twitter = Twitter(auth=OAuth(access_token, access_token_secret, consumer_key, consumer_secret))
+
+    target_name = sys.argv[1]
+    count = 200
+    cursor = -1
+
+    target_info = twitter.users.show(screen_name=target_name)
+    real_name = target_info["name"]
+    followers_count = target_info["followers_count"]
+    print(real_name, file=sys.stderr)
+    print(followers_count, file=sys.stderr)
+    
     while cursor != 0:
         try:
             target = twitter.followers.list(screen_name=target_name, count=count, cursor=cursor)

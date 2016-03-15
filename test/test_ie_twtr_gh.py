@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch
 
 import ie_twtr_gh
-from twitter import *
+import twitter
 
 
 class MainTestCase(unittest.TestCase):

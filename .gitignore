@@ -1,5 +1,6 @@
 .idea/
 .vagrant/
+.venv/
 __pycache__/
 Include/
 Lib/

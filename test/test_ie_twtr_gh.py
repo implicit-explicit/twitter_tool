@@ -36,6 +36,13 @@ class MainTestCase(unittest.TestCase):
         test_key_value = ['consumer_secret', 'consumer_key']
         self.assertEqual(auth_key_value[0], test_key_value[1])
 
+    def test_get_a_bearer_token(self):
+        """ Make sure the twitter.oauth2_dance() function gives us a bearer token  """
+        import os
+        auth_keys = ie_twtr_gh.get_auth_keys()
+        bearer_token_file = "test/test_bearer_token"
+        twitter.oauth2_dance(consumer_key=auth_keys[0], consumer_secret=auth_keys[1], token_filename=bearer_token_file)
+        os.remove(bearer_token_file)
 
 if __name__ == '__main__':
     unittest.main()

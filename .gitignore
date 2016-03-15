@@ -8,3 +8,4 @@ Scripts/
 
 pip-selfcheck.json
 pyvenv.cfg
+auth_keys

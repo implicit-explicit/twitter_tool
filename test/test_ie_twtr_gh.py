@@ -19,7 +19,22 @@ class MainTestCase(unittest.TestCase):
         elif (len(sys.argv[1]) > 0) & (test_command != "-v"):
             self.assertEqual(function_command, test_command)
 
-    
+    def test_read_auth_file(self):
+        """ Test if lines from 'auth_keys' are read correctly by comparison"""
+        with open("test/test_keys", "r") as test_file:
+            test_keys = []
+            for line in test_file:
+                test_keys.append(line.strip())
+        auth_keys = ie_twtr_gh.read_auth_file("test/test_keys")
+        self.assertListEqual(auth_keys, test_keys)
+
+    @patch("ie_twtr_gh.get_auth_keys")
+    def test_get_auth_keys(self, mock_get_auth_keys):
+        """ Checking if auth_keys read are what they are {o,o} """
+        mock_get_auth_keys.return_value = ['consumer_key', 'consumer_secret']
+        auth_key_value = ie_twtr_gh.get_auth_keys()
+        test_key_value = ['consumer_secret', 'consumer_key']
+        self.assertEqual(auth_key_value[0], test_key_value[1])
 
 
 if __name__ == '__main__':

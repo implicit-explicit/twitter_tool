@@ -1,3 +1,4 @@
+import math
 import sys
 import unittest
 from unittest.mock import patch
@@ -43,6 +44,38 @@ class MainTestCase(unittest.TestCase):
         bearer_token_file = "test/test_bearer_token"
         twitter.oauth2_dance(consumer_key=auth_keys[0], consumer_secret=auth_keys[1], token_filename=bearer_token_file)
         os.remove(bearer_token_file)
+
+
+class RateLimitCalculationTestCase(unittest.TestCase):
+    """ Tests to calculate the Twitter API Rate Limit.
+    Numbers source: https://dev.twitter.com/rest/reference/get/followers/list """
+
+    def setUp(self):
+        """ Data needed for calculations  """
+        import random
+        self.rate_request_limit = 30
+        self.rate_time_limit = 900
+        self.max_followers_per_request = 200
+        self.followers = random.randrange(0, 200000)
+
+    def test_calculate_hits(self):
+        """ Calculate the number of request hits (rounded up) """
+        hits = math.ceil(self.followers / self.max_followers_per_request)
+        print("{0} = {1} / {2}".format(hits, self.followers, self.max_followers_per_request))
+
+    def test_calculate_rate_limit_count(self):
+        """ Calculates the number of rate limits (rounded up) """
+        hits = math.ceil(self.followers / self.max_followers_per_request)
+        rate_limit_count = math.ceil(hits / self.rate_request_limit)
+        print("{0} = {1} / {2}".format(rate_limit_count, hits, self.rate_request_limit))
+
+    def test_rate_limit_duration(self):
+        """ Calculates the approximate duration in seconds """
+        hits = math.ceil(self.followers / self.max_followers_per_request)
+        rate_limit_count = math.ceil(hits / self.rate_request_limit)
+        rate_limit_duration = rate_limit_count * self.rate_time_limit
+        print("{0} sec. = {1} * {2}".format(rate_limit_duration, rate_limit_count, self.rate_time_limit))
+
 
 if __name__ == '__main__':
     unittest.main()

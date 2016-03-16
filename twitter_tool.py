@@ -47,11 +47,10 @@ def get_a_bearer_token(consumer_key, consumer_secret):
 def target_info(target_name):
     """ Prints out basic info about our target """
     twitter = main_twitter_api_call()
-    target_info = twitter.users.show(screen_name=target_name)
-    real_name = target_info["name"]
-    followers_count = target_info["followers_count"]
-    print(real_name, file=sys.stderr)
-    print(followers_count, file=sys.stderr)
+    target_information = twitter.users.show(screen_name=target_name)
+    real_name = target_information["name"]
+    followers_count = target_information["followers_count"]
+    print("Target: {0} - Followers: {1}".format(real_name, followers_count), file=sys.stderr)
     return
 
 
@@ -96,13 +95,10 @@ def format_error(exception, details):
 def main():
     target_name = target_check()
     auth_keys = get_auth_keys()
-
     try:
         get_a_bearer_token(consumer_key=auth_keys[0], consumer_secret=auth_keys[1])
         target_info(target_name)
-
-        # The nitty gritty
-        get_target_followers(target_name)
+        get_target_followers(target_name)  # The nitty gritty
     except TwitterHTTPError as e:
         format_error(type(e).__name__, e)
     except urllib.error.HTTPError as e:

@@ -3,7 +3,7 @@ import sys
 import unittest
 from unittest.mock import patch
 
-import ie_twtr_gh
+import twitter_tool
 import twitter
 
 
@@ -14,7 +14,7 @@ class MainTestCase(unittest.TestCase):
         """ Checks for target as command line argument """
         del sys.argv[1]
         test_command = sys.argv[1]
-        function_command = ie_twtr_gh.target_check()
+        function_command = twitter_tool.target_check()
         if test_command == "-v":
             print("No arguments passed, moving on!")
         elif (len(sys.argv[1]) > 0) & (test_command != "-v"):
@@ -26,21 +26,21 @@ class MainTestCase(unittest.TestCase):
             test_keys = []
             for line in test_file:
                 test_keys.append(line.strip())
-        auth_keys = ie_twtr_gh.read_auth_file("test/test_keys")
+        auth_keys = twitter_tool.read_auth_file("test/test_keys")
         self.assertListEqual(auth_keys, test_keys)
 
-    @patch("ie_twtr_gh.get_auth_keys")
+    @patch("twitter_tool.get_auth_keys")
     def test_get_auth_keys(self, mock_get_auth_keys):
         """ Checking if auth_keys read are what they are {o,o} """
         mock_get_auth_keys.return_value = ['consumer_key', 'consumer_secret']
-        auth_key_value = ie_twtr_gh.get_auth_keys()
+        auth_key_value = twitter_tool.get_auth_keys()
         test_key_value = ['consumer_secret', 'consumer_key']
         self.assertEqual(auth_key_value[0], test_key_value[1])
 
     def test_get_a_bearer_token(self):
         """ Make sure the twitter.oauth2_dance() function gives us a bearer token  """
         import os
-        auth_keys = ie_twtr_gh.get_auth_keys()
+        auth_keys = twitter_tool.get_auth_keys()
         bearer_token_file = "test/test_bearer_token"
         twitter.oauth2_dance(consumer_key=auth_keys[0], consumer_secret=auth_keys[1], token_filename=bearer_token_file)
         os.remove(bearer_token_file)

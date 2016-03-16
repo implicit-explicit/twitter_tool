@@ -1,7 +1,7 @@
 import os
 import sys
 import time
-import urllib.request
+import urllib.error
 
 from twitter import *
 
@@ -87,18 +87,32 @@ def main_twitter_api_call():
     return twitter
 
 
+def format_error(exception, details):
+    """ Error formatting function """
+    print("{}: {}".format(exception, details), file=sys.stderr)
+    return
+
+
 def main():
     target_name = target_check()
-
-    # Check for keys and bearer token
     auth_keys = get_auth_keys()
-    get_a_bearer_token(consumer_key=auth_keys[0], consumer_secret=auth_keys[1])
 
-    # Output some basic info about our target
-    target_info(target_name)
+    try:
+        get_a_bearer_token(consumer_key=auth_keys[0], consumer_secret=auth_keys[1])
+        target_info(target_name)
 
-    # The nitty gritty
-    get_target_followers(target_name)
+        # The nitty gritty
+        get_target_followers(target_name)
+    except TwitterHTTPError as e:
+        format_error(type(e).__name__, e)
+    except urllib.error.HTTPError as e:
+        format_error(type(e).__name__, e)
+    except urllib.error.URLError as e:
+        format_error(type(e).__name__, e)
+    except KeyboardInterrupt as e:
+        format_error(type(e).__name__, "Program halted by user.")
+    else:
+        print("Done.", file=sys.stderr)
 
 
 if __name__ == '__main__':

@@ -57,29 +57,26 @@ def target_info(target_name):
 
 def get_target_followers(target_name):
     """ Gets followers and their followers count from our target """
+    print("Getting requested data.", file=sys.stderr)
     twitter = main_twitter_api_call()
     count = 200
     cursor = -1
     while cursor != 0:
         try:
-            target = twitter.followers.list(screen_name=target_name, count=count, cursor=cursor)
+            target = twitter.followers.list(
+                screen_name=target_name, count=count, cursor=cursor, skip_status="true", include_user_entities="false")
             followers = target["users"]
             for follower in followers:
-                print("{}, {}".format(follower["screen_name"], follower["followers_count"]))
+                print("{0}, {1}, {2}".format(target_name, follower["screen_name"], follower["followers_count"]))
             cursor = target["next_cursor"]
         except TwitterHTTPError as e:
             if e.e.code == 429:
-                print("Fail: {} API rate limit exceeded".format(e.e.code), file=sys.stderr)
                 rate_limit_status = twitter.application.rate_limit_status()
-                time_to_reset_unix = rate_limit_status.rate_limit_reset
-                time_to_reset_asc = time.asctime(time.localtime(time_to_reset_unix))
                 time_to_wait = int(rate_limit_status.rate_limit_reset - time.time()) + 5  # avoid race
-                print("Interval limit of {} requests reached, next reset on {}: going to sleep for {} secs".format(
-                    rate_limit_status.rate_limit_limit, time_to_reset_asc, time_to_wait), file=sys.stderr)
+                print("Hit rate limit. Waiting {} secs.".format(time_to_wait), file=sys.stderr)
                 time.sleep(time_to_wait)
+                print("Getting requested data.", file=sys.stderr)
                 continue
-        except urllib.request.URLError as e:
-            pass
     return
 
 
